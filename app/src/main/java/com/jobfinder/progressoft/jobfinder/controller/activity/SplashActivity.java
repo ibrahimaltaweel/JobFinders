@@ -8,7 +8,7 @@ import android.widget.ImageView;
 
 import com.jobfinder.progressoft.jobfinder.R;
 
-public class Splash_Activity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
     private ImageView logo;
     private static int splashTimeOut=1000;
     @Override
@@ -20,7 +20,7 @@ public class Splash_Activity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent i = new Intent(Splash_Activity.this,MainActivity.class);
+                Intent i = new Intent(SplashActivity.this,MainActivity.class);
                 startActivity(i);
                 finish();
             }

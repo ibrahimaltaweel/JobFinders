@@ -12,32 +12,18 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.jobfinder.progressoft.jobfinder.R;
-import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJobs;
-import com.squareup.picasso.Picasso;
+import com.jobfinder.progressoft.jobfinder.controller.activity.CallBack;
+import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJob;
 
 import java.util.List;
 
 public class GitHubJobsAdapter extends RecyclerView.Adapter<GitHubJobsAdapter.MyViewHolder> implements ListAdapter {
 
-    public static List<GitHubJobs> gitHubJobsList;
+    public List<GitHubJob> gitHubJobList;
     Context context;
     private int selectedIndex;
+    private CallBack callBack;
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, locatin, companyName, fullTime, createdAt;
-        public ImageView imageView;
-        public int index;
-
-        public MyViewHolder(View view) {
-            super(view);
-            title = (TextView) view.findViewById(R.id.txt_title);
-            locatin = (TextView) view.findViewById(R.id.txt_locaton);
-            companyName = (TextView) view.findViewById(R.id.txt_company_name);
-            fullTime = (TextView) view.findViewById(R.id.txt_full_time);
-            createdAt = (TextView) view.findViewById(R.id.txt_created_at);
-            imageView = (ImageView) view.findViewById(R.id.imageView);
-        }
-    }
 
     public int getSelectedIndex() {
         return selectedIndex;
@@ -48,9 +34,10 @@ public class GitHubJobsAdapter extends RecyclerView.Adapter<GitHubJobsAdapter.My
         notifyDataSetChanged();
     }
 
-    public GitHubJobsAdapter(Context context, List<GitHubJobs> gitHubJobsList) {
-        this.gitHubJobsList = gitHubJobsList;
+    public GitHubJobsAdapter(Context context, List<GitHubJob> gitHubJobList, CallBack callBack) {
+        this.gitHubJobList = gitHubJobList;
         this.context = context;
+        this.callBack = callBack;
     }
 
     @Override
@@ -58,52 +45,61 @@ public class GitHubJobsAdapter extends RecyclerView.Adapter<GitHubJobsAdapter.My
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.git_hub_job_list_row, parent, false);
 
+
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        GitHubJobs jobs = gitHubJobsList.get(position);
-        if (jobs.getTitle().length() > 0){
-            holder.title.setText(jobs.getTitle());}
-            else{
+
+        GitHubJob gitHubJob = gitHubJobList.get(position);
+        if (gitHubJob.getTitle().length() > 0) {
+            holder.title.setText(gitHubJob.getTitle());
+        } else {
             holder.title.setVisibility(View.GONE);
         }
-        String location=jobs.getLocation().replaceAll("[;\\/:*?\"<>|&']","");
-        if (jobs.getLocation().length() > 0){
-            holder.locatin.setText(location);}
-        else{
+        String location = gitHubJob.getLocation().replaceAll("[;\\/:*?\"<>|&']", "");
+        if (gitHubJob.getLocation().length() > 0) {
+            holder.locatin.setVisibility(View.VISIBLE);
+
+            holder.locatin.setText(location);
+        } else {
             holder.locatin.setVisibility(View.GONE);
         }
-        if (jobs.getCompany().length() > 0){
-            holder.companyName.setText(jobs.getCompany());}
-        else{
+        if (gitHubJob.getCompany().length() > 0) {
+            holder.companyName.setVisibility(View.VISIBLE);
+            holder.companyName.setText(gitHubJob.getCompany());
+        } else {
             holder.companyName.setVisibility(View.GONE);
         }
-        if (jobs.getCreatedAt().length() > 0){
-            holder.createdAt.setText(jobs.getCreatedAt());}
-        else{
+        if (gitHubJob.getCreatedAt().length() > 0) {
+            holder.createdAt.setVisibility(View.VISIBLE);
+
+            holder.createdAt.setText(gitHubJob.getCreatedAt());
+        } else {
             holder.createdAt.setVisibility(View.GONE);
         }
-        if (jobs.getType().length() > 0){
-            holder.fullTime.setText(jobs.getType());}
-        else{
+        if (gitHubJob.getType().length() > 0) {
+            holder.fullTime.setText(gitHubJob.getType());
+            holder.fullTime.setVisibility(View.VISIBLE);
+        } else {
             holder.fullTime.setVisibility(View.GONE);
         }
-        if (jobs.getCompanyLogo().length() > 0){
-            //Picasso.with(context).load(jobs.getCompanyLogo()).placeholder(R.drawable.splash_screen).into(holder.imageView);
+        if (gitHubJob.getCompanyLogo().length() > 0) {
             Glide.with(context)
-                    .load(jobs.getCompanyLogo())
+                    .load(gitHubJob.getCompanyLogo())
                     .into(holder.imageView);
+        } else {
+            holder.imageView.setImageResource(R.drawable.splash_screen);
         }
-        else{
-            holder.imageView.setBackgroundResource(R.drawable.splash_screen);
-        }
+
+        holder.onClick(callBack,gitHubJob.getUrl());
+
     }
 
     @Override
     public int getItemCount() {
-        return gitHubJobsList.size();
+        return gitHubJobList.size();
     }
 
     @Override
@@ -149,5 +145,33 @@ public class GitHubJobsAdapter extends RecyclerView.Adapter<GitHubJobsAdapter.My
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+     static class MyViewHolder extends RecyclerView.ViewHolder {
+         TextView title, locatin, companyName, fullTime, createdAt;
+         ImageView imageView;
+         int index;
+         View view;
+
+
+         MyViewHolder(View view) {
+            super(view);
+            this.view = view;
+            title = view.findViewById(R.id.txt_title);
+            locatin = view.findViewById(R.id.txt_locaton);
+            companyName = view.findViewById(R.id.txt_company_name);
+            fullTime = view.findViewById(R.id.txt_full_time);
+            createdAt = view.findViewById(R.id.txt_created_at);
+            imageView = view.findViewById(R.id.imageView);
+
+        }
+        void onClick(final CallBack callBack,final String url){
+             view.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
+                    callBack.onRecyclerListener(url);
+                 }
+             });
+        }
     }
 }

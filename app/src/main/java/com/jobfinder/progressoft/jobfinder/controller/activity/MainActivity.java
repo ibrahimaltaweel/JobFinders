@@ -22,16 +22,16 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.jobfinder.progressoft.jobfinder.R;
-import com.jobfinder.progressoft.jobfinder.controller.listener.RecyclerTouchListener;
 import com.jobfinder.progressoft.jobfinder.controller.tasks.GitHubJobsGetterTask;
 import com.jobfinder.progressoft.jobfinder.controller.tasks.SearchGovGetterTask;
-import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJobs;
+import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJob;
 import com.jobfinder.progressoft.jobfinder.model.vo.response.GitHubJobsResponse;
 import com.jobfinder.progressoft.jobfinder.model.vo.response.SearchGovResponse;
 import com.jobfinder.progressoft.jobfinder.view.adapter.GitHubJobsAdapter;
@@ -39,9 +39,10 @@ import com.jobfinder.progressoft.jobfinder.view.adapter.GitHubJobsAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import static android.content.ContentValues.TAG;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GitHubJobsGetterTask.OnGitHubJobsReady,SearchGovGetterTask.OnSearchGovReady {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GitHubJobsGetterTask.OnGitHubJobsReady, SearchGovGetterTask.OnSearchGovReady, CallBack {
     private GitHubJobsAdapter gitHubJobsAdapter;
     private RecyclerView recyclerView;
     private ProgressDialog progressDialog;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int selectedProvider = 0;
     String description = "";
     String location = "";
-    List<GitHubJobs> getJobsList;
+    List<GitHubJob> getJobsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,21 +65,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void getGetHubJobs(int provider, String description, String location) {
         startLoading();
-        if(isNetworkAvailable()){
-        Log.d(TAG, "getGetHubJobs: "+provider+description+location);
-        switch (provider) {
-            case 0:
-                new GitHubJobsGetterTask(this, MainActivity.this).execute(description, location);
-                new SearchGovGetterTask(this, MainActivity.this).execute(description+location);
-                break;
-            case 1:
-                new GitHubJobsGetterTask(this, MainActivity.this).execute(description, location);
-                break;
-            case 2:
-                new SearchGovGetterTask(this, MainActivity.this).execute(description+location);
-                break;
-        }}
-        else{
+        if (isNetworkAvailable()) {
+            Log.d(TAG, "getGetHubJobs: " + provider + description + location);
+            switch (provider) {
+                case 0:
+                    new GitHubJobsGetterTask(this, MainActivity.this).execute(description, location);
+                    new SearchGovGetterTask(this, MainActivity.this).execute(description + location);
+                    break;
+                case 1:
+                    new GitHubJobsGetterTask(this, MainActivity.this).execute(description, location);
+                    break;
+                case 2:
+                    new SearchGovGetterTask(this, MainActivity.this).execute(description + location);
+                    break;
+            }
+        } else {
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
             stopLoading();
         }
@@ -125,20 +126,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                GitHubJobs gitHubJobs = GitHubJobsAdapter.gitHubJobsList.get(position);
-                openWebURL(gitHubJobs.getUrl());
-                Toast.makeText(getApplicationContext(), gitHubJobs.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
-
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyB6oP31az92snW2KXth0YR5rGAAtrS7814");
         }
@@ -152,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
-                Log.i("place", "Place: " + place.getName() );
-                location=place.getName();
+                Log.i("place", "Place: " + place.getName());
+                location = place.getName();
                 getGetHubJobs(selectedProvider, description, location);
 
             }
@@ -176,20 +163,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onGitHubJobsReady(GitHubJobsResponse gitHubJobsResponse) {
         try {
-            if(selectedProvider==0){
-        getJobsList=gitHubJobsResponse.getGitJobsList();}
-        else {
-            if (progressDialog.isShowing()) {
-                stopLoading();
-            }
-                gitHubJobsAdapter = new GitHubJobsAdapter(getApplicationContext(), gitHubJobsResponse.getGitJobsList());
+            if (selectedProvider == 0) {
+                getJobsList = gitHubJobsResponse.getGitJobsList();
+            } else {
+                if (progressDialog.isShowing()) {
+                    stopLoading();
+                }
+                gitHubJobsAdapter = new GitHubJobsAdapter(getApplicationContext(), gitHubJobsResponse.getGitJobsList(), this);
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
                 recyclerView.setLayoutManager(mLayoutManager);
                 recyclerView.setItemAnimator(new DefaultItemAnimator());
                 recyclerView.setAdapter(gitHubJobsAdapter);
                 gitHubJobsAdapter.notifyDataSetChanged();
 
-        }
+            }
         } catch (Exception e) {
 
         }
@@ -197,24 +184,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onSearchGovReady(SearchGovResponse searchGovJobsResponse) {
-        try{
-            if(selectedProvider==0){
-        getJobsList.addAll(searchGovJobsResponse.getSearchGovJobsList());}
-        else{
-            getJobsList.clear();
-            getJobsList.addAll(searchGovJobsResponse.getSearchGovJobsList());}
+        try {
+            if (selectedProvider == 0) {
+                getJobsList.addAll(searchGovJobsResponse.getSearchGovJobsList());
+            } else {
+                getJobsList.clear();
+                getJobsList.addAll(searchGovJobsResponse.getSearchGovJobsList());
+            }
 
-        if(progressDialog!=null){
-            stopLoading();}
+            if (progressDialog != null) {
+                stopLoading();
+            }
 
-            gitHubJobsAdapter = new GitHubJobsAdapter(getApplicationContext(), getJobsList);
+            gitHubJobsAdapter = new GitHubJobsAdapter(getApplicationContext(), getJobsList, this);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(gitHubJobsAdapter);
             gitHubJobsAdapter.notifyDataSetChanged();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -222,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         selectedProvider = (int) parent.getItemIdAtPosition(position);
-        getGetHubJobs(selectedProvider,description,location);
+        getGetHubJobs(selectedProvider, description, location);
     }
 
     public void onNothingSelected(AdapterView<?> arg0) {
@@ -254,4 +242,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    @Override
+    public void onRecyclerListener(String url) {
+        openWebURL(url);
+    }
 }

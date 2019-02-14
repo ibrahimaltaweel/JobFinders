@@ -3,7 +3,7 @@ package com.jobfinder.progressoft.jobfinder.model.vo.response;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJobs;
+import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJob;
 import com.jobfinder.progressoft.jobfinder.model.vo.ResponseError;
 
 import java.util.List;
@@ -12,9 +12,9 @@ import java.util.List;
 public class GitHubJobsResponse implements Parcelable {
 
     private ResponseError error;
-    private List<GitHubJobs> gitHubJobs;
+    private List<GitHubJob> gitHubJobs;
 
-    public GitHubJobsResponse(List<GitHubJobs> gitHubJobs) {
+    public GitHubJobsResponse(List<GitHubJob> gitHubJobs) {
         this.setGitJobsList(gitHubJobs);
     }
 
@@ -24,7 +24,7 @@ public class GitHubJobsResponse implements Parcelable {
 
     protected GitHubJobsResponse(Parcel in) {
         error = in.readParcelable(ResponseError.class.getClassLoader());
-        gitHubJobs = in.createTypedArrayList(GitHubJobs.CREATOR);
+        gitHubJobs = in.createTypedArrayList(GitHubJob.CREATOR);
     }
 
     public static final Creator<GitHubJobsResponse> CREATOR = new Creator<GitHubJobsResponse>() {
@@ -47,11 +47,11 @@ public class GitHubJobsResponse implements Parcelable {
         this.error = error;
     }
 
-    public List<GitHubJobs> getGitJobsList() {
+    public List<GitHubJob> getGitJobsList() {
         return gitHubJobs;
     }
 
-    public void setGitJobsList(List<GitHubJobs> gitHubJobs) {
+    public void setGitJobsList(List<GitHubJob> gitHubJobs) {
         this.gitHubJobs = gitHubJobs;
     }
 

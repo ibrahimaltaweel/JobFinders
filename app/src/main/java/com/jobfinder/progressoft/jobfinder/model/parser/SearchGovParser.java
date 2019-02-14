@@ -1,7 +1,6 @@
 package com.jobfinder.progressoft.jobfinder.model.parser;
 
-import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJobs;
-import com.jobfinder.progressoft.jobfinder.model.vo.response.GitHubJobsResponse;
+import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJob;
 import com.jobfinder.progressoft.jobfinder.model.vo.response.SearchGovResponse;
 
 import org.json.JSONArray;
@@ -36,7 +35,7 @@ public class SearchGovParser {
             /*if (responseError != null && responseError.getErrorCode() != 0) {
                 return new GitHubJobsResponse(responseError);
             }*/
-            List<GitHubJobs> gitHubJobsList = new ArrayList<>();
+            List<GitHubJob> gitHubJobList = new ArrayList<>();
             //JSONArray responseJsonArray = jsonObject.getJSONArray(ARRAY_RESPONSE);
 
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -53,12 +52,12 @@ public class SearchGovParser {
                 String type =contactJsonObject.has(VALUE_TYPE)? contactJsonObject.getString(VALUE_TYPE):"";
                 String url = contactJsonObject.has(VALUE_URL)?contactJsonObject.getString(VALUE_URL):"";
 
-                GitHubJobs gitHubJobs = new GitHubJobs(company, companyUrl,companyLogo,createdAt,description,apply,
+                GitHubJob gitHubJob = new GitHubJob(company, companyUrl,companyLogo,createdAt,description,apply,
                 id,location,title,type,url);
-                gitHubJobsList.add(gitHubJobs);
+                gitHubJobList.add(gitHubJob);
             }
 
-            return new SearchGovResponse(gitHubJobsList);
+            return new SearchGovResponse(gitHubJobList);
         } catch (JSONException e) {
             e.printStackTrace();
         }

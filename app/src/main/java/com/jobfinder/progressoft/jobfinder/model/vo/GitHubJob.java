@@ -3,7 +3,7 @@ package com.jobfinder.progressoft.jobfinder.model.vo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class GitHubJobs implements Parcelable {
+public class GitHubJob implements Parcelable {
     private String company;
     private String companyUrl;
     private String companyLogo;
@@ -16,7 +16,7 @@ public class GitHubJobs implements Parcelable {
     private String url;
     private String id;
 
-    public GitHubJobs(Parcel in) {
+    public GitHubJob(Parcel in) {
         company = in.readString();
         companyUrl = in.readString();
         companyLogo = in.readString();
@@ -119,7 +119,7 @@ public class GitHubJobs implements Parcelable {
         this.url = url;
     }
 
-    public GitHubJobs(String company, String companyUrl, String companyLogo, String createdAt, String description, String apply, String id, String location, String title, String type, String url) {
+    public GitHubJob(String company, String companyUrl, String companyLogo, String createdAt, String description, String apply, String id, String location, String title, String type, String url) {
         this.setCompany(company);
         this.setCompanyUrl(companyUrl);
         this.setCompanyLogo(companyLogo);
@@ -133,15 +133,15 @@ public class GitHubJobs implements Parcelable {
         this.setUrl(url);
     }
 
-    public static final Creator<GitHubJobs> CREATOR = new Creator<GitHubJobs>() {
+    public static final Creator<GitHubJob> CREATOR = new Creator<GitHubJob>() {
         @Override
-        public GitHubJobs createFromParcel(Parcel in) {
-            return new GitHubJobs(in);
+        public GitHubJob createFromParcel(Parcel in) {
+            return new GitHubJob(in);
         }
 
         @Override
-        public GitHubJobs[] newArray(int size) {
-            return new GitHubJobs[size];
+        public GitHubJob[] newArray(int size) {
+            return new GitHubJob[size];
         }
     };
 
