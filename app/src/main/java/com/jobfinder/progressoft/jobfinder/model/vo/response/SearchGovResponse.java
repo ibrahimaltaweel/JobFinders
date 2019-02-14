@@ -4,28 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.jobfinder.progressoft.jobfinder.model.vo.GitHubJob;
-import com.jobfinder.progressoft.jobfinder.model.vo.ResponseError;
 
 import java.util.List;
 
 
 public class SearchGovResponse implements Parcelable {
-
-    private ResponseError error;
-    private List<GitHubJob> gitHubJobs;
-
-    public SearchGovResponse(List<GitHubJob> gitHubJobs) {
-        this.setGitJobsList(gitHubJobs);
-    }
-
-    public SearchGovResponse(ResponseError error) {
-        this.setError(error);
-    }
-
-    protected SearchGovResponse(Parcel in) {
-        error = in.readParcelable(ResponseError.class.getClassLoader());
-        gitHubJobs = in.createTypedArrayList(GitHubJob.CREATOR);
-    }
 
     public static final Creator<SearchGovResponse> CREATOR = new Creator<SearchGovResponse>() {
         @Override
@@ -38,13 +21,15 @@ public class SearchGovResponse implements Parcelable {
             return new SearchGovResponse[size];
         }
     };
+    private List<GitHubJob> gitHubJobs;
 
-    public ResponseError getError() {
-        return error;
+
+    public SearchGovResponse(List<GitHubJob> gitHubJobs) {
+        this.setGitJobsList(gitHubJobs);
     }
 
-    public void setError(ResponseError error) {
-        this.error = error;
+    protected SearchGovResponse(Parcel in) {
+        gitHubJobs = in.createTypedArrayList(GitHubJob.CREATOR);
     }
 
     public List<GitHubJob> getSearchGovJobsList() {
@@ -62,7 +47,6 @@ public class SearchGovResponse implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(error, flags);
         dest.writeTypedList(gitHubJobs);
     }
 }

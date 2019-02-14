@@ -4,6 +4,17 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class GitHubJob implements Parcelable {
+    public static final Creator<GitHubJob> CREATOR = new Creator<GitHubJob>() {
+        @Override
+        public GitHubJob createFromParcel(Parcel in) {
+            return new GitHubJob(in);
+        }
+
+        @Override
+        public GitHubJob[] newArray(int size) {
+            return new GitHubJob[size];
+        }
+    };
     private String company;
     private String companyUrl;
     private String companyLogo;
@@ -15,6 +26,7 @@ public class GitHubJob implements Parcelable {
     private String type;
     private String url;
     private String id;
+
 
     public GitHubJob(Parcel in) {
         company = in.readString();
@@ -30,6 +42,19 @@ public class GitHubJob implements Parcelable {
         id = in.readString();
     }
 
+    public GitHubJob(String company, String companyUrl, String companyLogo, String createdAt, String description, String apply, String id, String location, String title, String type, String url) {
+        this.setCompany(company);
+        this.setCompanyUrl(companyUrl);
+        this.setCompanyLogo(companyLogo);
+        this.setCreatedAt(createdAt);
+        this.setDescription(description);
+        this.setApply(apply);
+        this.setId(id);
+        this.setLocation(location);
+        this.setTitle(title);
+        this.setType(type);
+        this.setUrl(url);
+    }
 
     public String getCompany() {
         return company;
@@ -118,32 +143,6 @@ public class GitHubJob implements Parcelable {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    public GitHubJob(String company, String companyUrl, String companyLogo, String createdAt, String description, String apply, String id, String location, String title, String type, String url) {
-        this.setCompany(company);
-        this.setCompanyUrl(companyUrl);
-        this.setCompanyLogo(companyLogo);
-        this.setCreatedAt(createdAt);
-        this.setDescription(description);
-        this.setApply(apply);
-        this.setId(id);
-        this.setLocation(location);
-        this.setTitle(title);
-        this.setType(type);
-        this.setUrl(url);
-    }
-
-    public static final Creator<GitHubJob> CREATOR = new Creator<GitHubJob>() {
-        @Override
-        public GitHubJob createFromParcel(Parcel in) {
-            return new GitHubJob(in);
-        }
-
-        @Override
-        public GitHubJob[] newArray(int size) {
-            return new GitHubJob[size];
-        }
-    };
 
     @Override
     public int describeContents() {
